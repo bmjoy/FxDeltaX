@@ -22,8 +22,14 @@ public class GameManager : MonoBehaviour {
         BETA
     };
 
-    // Use this for initialization
-    void Awake ()
+    public static GameObject GetCurrentCharacter()
+    {
+        //return instance.characters[instance.characterIdx];
+        return instance.teams[instance.activeTeam][instance.characterIdxs[instance.activeTeam]];
+    }
+
+	// Use this for initialization
+	void Awake ()
     {
         if (instance == null)
             instance = this;
