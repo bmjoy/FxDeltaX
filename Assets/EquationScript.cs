@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets._2D;
@@ -14,11 +15,14 @@ public class EquationScript : MonoBehaviour {
 
     List<Vector3> createdTrajectory;
 
-    Text2AST.Equation equation;
+    public Text2AST.Equation equation;
 
     Text2AST.Variables variables;
 
     string equationString = "";
+
+    public static EquationScript instance;
+
 
 	// Use this for initialization
     public void ActualizeEquation(string newEquationString)
@@ -36,15 +40,27 @@ public class EquationScript : MonoBehaviour {
                 }
                 createdTrajectory = newlyCreatedTrajectory;
             }
-            catch
+            catch(Text2AST.WrongEquationException)
             {
-                Debug.Log("caught");
+                Debug.Log("Wrong written equation");
+                equation = null;
+            }
+            catch (Text2AST.BadDefinedException)
+            {
+                Debug.Log("Bad defined equation");
+                equation = null;
+            }
+            catch(System.Exception ex)
+            {
+                Debug.Log("Unknown exception");
+                Debug.Log(ex.Message);
                 equation = null;
             }
             equationString = newEquationString;
         }
     }
 	void Start () {
+        instance = this;
         SpawnLineGenerator();
         variables = new Text2AST.Variables(new string[] { "x" });
 	}
@@ -57,7 +73,7 @@ public class EquationScript : MonoBehaviour {
 	void Update () {
         if(equation != null)
         {
-            Debug.Log(equation.GetValue());
+            //Debug.Log(equation.GetValue());
             DrawTrajectory();
         }
 	}
