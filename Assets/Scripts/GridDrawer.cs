@@ -29,18 +29,16 @@ public class GridDrawer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 position = GameManager.GetCurrentCharacter().GetComponent<Transform>().position;
+        GameObject currentCharacter = GameManager.GetCurrentCharacter();
+        if (currentCharacter == null)
+            return;
+
+        Vector3 position = currentCharacter.GetComponent<Transform>().position;
         if(lastPosition != position)
         {
-            GameObject currentCharacter = GameManager.GetCurrentCharacter();
             LineRenderer lRend = newLineGen.GetComponent<LineRenderer>();
 
             lRend.widthMultiplier = 0.3f;
-
-           
-
-
-
 
             DrawGrid(lRend, position);
 

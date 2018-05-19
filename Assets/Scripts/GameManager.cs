@@ -4,7 +4,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets._2D;
 
+public enum PlayerMode
+{
+    MOVING,
+    SHOOTING
+};
+
 public class GameManager : MonoBehaviour {
+
+    private enum State
+    {
+        TEAM_PREPARATION,
+        GAMEPLAY
+    };
+
+    private enum Team
+    {
+        ALPHA,
+        BETA
+    };
 
     public static GameManager instance = null;
     public GameObject currentCharacter;
@@ -13,29 +31,26 @@ public class GameManager : MonoBehaviour {
     private Dictionary<Team, Color> teamColors;
     private Team activeTeam;
     private Dictionary<Team, int> characterIdxs;
-    private const int playersQty = 5;
-    private const int teamsQty = 2;
 
     private Timer timer;
 
-    private enum State
-    {
-        TEAM_PREPARATION,
-        GAMEPLAY
-    };
-
     private State state = State.TEAM_PREPARATION;
+    private PlayerMode playerMode = PlayerMode.MOVING;
     private bool characterPlacing = false;
 
-    private enum Team
-    {
-        ALPHA,
-        BETA
-    };
+    private const int playersQty = 2;
+    private const int teamsQty = 2;
+    private const int serieTime = 30;
+
 
     public static GameObject GetCurrentCharacter()
     {
         return instance.currentCharacter;
+    }
+
+    public static PlayerMode GetPlayerMode()
+    {
+        return instance.playerMode;
     }
 
 	// Use this for initialization
@@ -73,9 +88,9 @@ public class GameManager : MonoBehaviour {
     void Update()
     {
         if (state == State.TEAM_PREPARATION)
-        {
             UpdateOnTeamPreparation();
-        }
+        else if (state == State.GAMEPLAY)
+            UpdateOnGameplay();
     }
 
     private void UpdateOnTeamPreparation()
@@ -115,12 +130,22 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private void UpdateOnGameplay()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            playerMode = playerMode.Next();
+            UpdateCharacterOnModeChange();
+            Debug.Log("Player mode changed to " + playerMode.ToString());
+        }
+    }
+
     private void prepareToGameplay()
     {
         state = State.GAMEPLAY;
         Camera.main.GetComponent<CameraController>().Enable(true);
         enableCharacter(activeTeam, characterIdxs[activeTeam]);
-        this.InvokeRepeating("OnRoundFinished", 10, 10);
+        this.InvokeRepeating("OnRoundFinished", serieTime, serieTime);
     }
 
     private bool isCurrentTeamFullyCreated()
@@ -150,10 +175,16 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private void UpdateCharacterOnModeChange()
+    {
+        teams[activeTeam][characterIdxs[activeTeam]].GetComponent<Platformer2DUserControl>().enabled = (playerMode == PlayerMode.MOVING);
+    }
+
     private void OnRoundFinished()
     {
         characterIdxs[activeTeam] = (characterIdxs[activeTeam] + 1) % teams[activeTeam].Count;
         activeTeam = activeTeam.Next();
         enableCharacter(activeTeam, characterIdxs[activeTeam]);
+        playerMode = PlayerMode.MOVING;
     }
 }

@@ -29,10 +29,13 @@ public class ProjectilesManager : MonoBehaviour {
         if(Input.GetKeyDown(KeyCode.Return))
         {
             Debug.Log("enter pressed");
+            GameObject currentCharacter = GameManager.instance.currentCharacter;
+            if (GameManager.GetPlayerMode() != PlayerMode.SHOOTING)
+                return;
+
             Text2AST.Equation equation = EquationScript.instance.equation;
             if(equation != null)
             {
-                GameObject currentCharacter = GameManager.instance.currentCharacter;
                 AddProjectile(
                     currentCharacter.GetComponent<Transform>().position,
                     equation,

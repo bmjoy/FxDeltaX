@@ -71,12 +71,16 @@ public class EquationScript : MonoBehaviour {
     }
 	// Update is called once per frame
 	void Update () {
-        if(equation != null)
+        if(equation != null && GameManager.GetPlayerMode() == PlayerMode.SHOOTING)
         {
             //Debug.Log(equation.GetValue());
-            DrawTrajectory();
+                DrawTrajectory();
         }
-	}
+        else
+        {
+            ClearTrajectory();
+        }
+    }
 
     void DrawTrajectory()
     {
@@ -89,5 +93,12 @@ public class EquationScript : MonoBehaviour {
 
         lRend.positionCount = createdTrajectory.Count;
         lRend.SetPositions(createdTrajectory.Select(vec => new Vector3(isRight ? vec.x : -vec.x, vec.y, vec.z) + location).ToArray());
+    }
+
+    void ClearTrajectory()
+    {
+        LineRenderer lRend = newLineGen.GetComponent<LineRenderer>();
+        for(int i=0; i<lRend.positionCount; i++)
+            lRend.SetPosition(i, Vector3.zero);
     }
 }
