@@ -32,7 +32,7 @@ public class ProjectilesManager : MonoBehaviour {
             Text2AST.Equation equation = EquationScript.instance.equation;
             if(equation != null)
             {
-                GameObject currentCharacter = GameManager.instance.curentCharacter;
+                GameObject currentCharacter = GameManager.instance.currentCharacter;
                 AddProjectile(
                     currentCharacter.GetComponent<Transform>().position,
                     equation,

@@ -7,16 +7,25 @@ public class CameraController : MonoBehaviour
 
     public GameObject player;
     private Vector3 offset;
+    private bool enabled = false;
 
 	void Start ()
     {
-        player = GameManager.instance.curentCharacter;
-        offset = transform.position - player.transform.position;
+        offset = new Vector3(0, 0, -10);
 	}
-		
+
+    public void Enable (bool en)
+    {
+        enabled = en;
+    }
 	void LateUpdate ()
     {
-        player = GameManager.instance.curentCharacter;
+        if (!enabled)
+            return;
+
+        player = GameManager.instance.currentCharacter;
+        if (player == null)
+            return;
         transform.position = player.transform.position + offset;
 	}
     

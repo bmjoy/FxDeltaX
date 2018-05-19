@@ -7,14 +7,25 @@ using UnityStandardAssets._2D;
 public class GameManager : MonoBehaviour {
 
     public static GameManager instance = null;
-    public GameObject curentCharacter;
+    public GameObject currentCharacter;
 
     private Dictionary<Team, List<GameObject>> teams;
     private Dictionary<Team, Color> teamColors;
     private Team activeTeam;
     private Dictionary<Team, int> characterIdxs;
+    private const int playersQty = 5;
+    private const int teamsQty = 2;
 
     private Timer timer;
+
+    private enum State
+    {
+        TEAM_PREPARATION,
+        GAMEPLAY
+    };
+
+    private State state = State.TEAM_PREPARATION;
+    private bool characterPlacing = false;
 
     private enum Team
     {
@@ -24,8 +35,7 @@ public class GameManager : MonoBehaviour {
 
     public static GameObject GetCurrentCharacter()
     {
-        //return instance.characters[instance.characterIdx];
-        return instance.teams[instance.activeTeam][instance.characterIdxs[instance.activeTeam]];
+        return instance.currentCharacter;
     }
 
 	// Use this for initialization
@@ -43,11 +53,8 @@ public class GameManager : MonoBehaviour {
             {Team.ALPHA, new Color(1,0,0)},
             {Team.BETA, new Color(0,0,1)}
         };
-        createTeams(2);
+        createTeams(teamsQty);
         activeTeam = Team.ALPHA;
-        enableCharacter(activeTeam, characterIdxs[activeTeam]);
-
-        this.InvokeRepeating("OnRoundFinished", 10, 10);
     }
 
     private void createTeams(int players)
@@ -57,31 +64,82 @@ public class GameManager : MonoBehaviour {
 
         foreach (Team team in System.Enum.GetValues(typeof(Team)))
         {
-            var teamCharacters = new List<GameObject>();
-            for (int i = 0; i < players; ++i)
-            {
-                GameObject character = (GameObject)Instantiate(Resources.Load("CharacterRobotBoy"));
-                var characterRenderer = character.GetComponent<Renderer>();
-                characterRenderer.material.color = teamColors[team];
-                teamCharacters.Add(character);
-            }
-            teams[team] = teamCharacters;
+            teams[team] = new List<GameObject>();
             characterIdxs[team] = 0;
         }
     }
 
     // Update is called once per frame
-    void Update () {
-        if (Input.GetKeyDown(KeyCode.Tab))
+    void Update()
+    {
+        if (state == State.TEAM_PREPARATION)
         {
-            characterIdxs[activeTeam] = (characterIdxs[activeTeam] + 1) % teams[activeTeam].Count;
-            enableCharacter(activeTeam, characterIdxs[activeTeam]);
+            UpdateOnTeamPreparation();
         }
+    }
+
+    private void UpdateOnTeamPreparation()
+    {
+        if (!characterPlacing)
+        {
+            if (areAllTeamsFullyCreated())
+            {
+                prepareToGameplay();
+                return;
+            }
+            else if(isCurrentTeamFullyCreated())
+            {
+                activeTeam = activeTeam.Next();
+            }
+
+            var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePos.z = 0;
+
+            GameObject character = (GameObject)Instantiate(Resources.Load("CharacterRobotBoy"), mousePos, transform.rotation);
+            character.GetComponent<Platformer2DUserControl>().enabled = false;
+   
+            var characterRenderer = character.GetComponent<Renderer>();
+            characterRenderer.material.color = teamColors[activeTeam];
+
+            teams[activeTeam].Add(character);
+            characterPlacing = true;
+            currentCharacter = character;
+        }
+        else
+        {
+            var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePos.z = 0;
+            currentCharacter.transform.position = mousePos;
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+                characterPlacing = false;
+        }
+    }
+
+    private void prepareToGameplay()
+    {
+        state = State.GAMEPLAY;
+        Camera.main.GetComponent<CameraController>().Enable(true);
+        enableCharacter(activeTeam, characterIdxs[activeTeam]);
+        this.InvokeRepeating("OnRoundFinished", 10, 10);
+    }
+
+    private bool isCurrentTeamFullyCreated()
+    {
+        return teams[activeTeam].Count == playersQty;
+    }
+
+    private bool areAllTeamsFullyCreated()
+    {
+        bool teamsFull = true;
+        foreach (var item in teams)
+            teamsFull &= (item.Value.Count == playersQty);
+
+        return teamsFull;
     }
 
     private void enableCharacter(Team team, int idx)
     {
-        curentCharacter = teams[team][idx];
+        currentCharacter = teams[team][idx];
         foreach (Team t in System.Enum.GetValues(typeof(Team)))
         {
             for(int i=0; i<teams[t].Count; i++)
@@ -94,6 +152,7 @@ public class GameManager : MonoBehaviour {
 
     private void OnRoundFinished()
     {
+        characterIdxs[activeTeam] = (characterIdxs[activeTeam] + 1) % teams[activeTeam].Count;
         activeTeam = activeTeam.Next();
         enableCharacter(activeTeam, characterIdxs[activeTeam]);
     }
