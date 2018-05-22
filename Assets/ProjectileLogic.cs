@@ -6,9 +6,17 @@ using System.Linq;
 
 public class ProjectileLogic : MonoBehaviour
 {
-//    GameObject gameObj;
+    private enum State
+    {
+        NotEvenAlive,
+        Flying,
+        Exploding,
+        Dying
+    }
+    //    GameObject gameObj;
     ProjectileDrawer drawer;
     CircleCollider2D circleCol;
+    ExplosionLogic explosion;
     Rigidbody2D rigid;
     //PolygonCollider2D collider;
     Text2AST.Equation equation;
@@ -20,9 +28,11 @@ public class ProjectileLogic : MonoBehaviour
     Vector3 offsetY;
     float initDX;
     bool alreadyHit = false;
+    State state = State.NotEvenAlive;
     float length = 0.3f;
     float isRight = 0.0f;
     int initTTL = 200;
+    int explosionTTL = 40;
     bool goDestroy = false;
     Dictionary<string, double> values = new Dictionary<string, double>() { { "x", 0f } };
     // Use this for initialization
@@ -45,49 +55,66 @@ public class ProjectileLogic : MonoBehaviour
         isRight = looksRight ? 1 : -1;
         goDestroy = true;
         this.toDestroy = toDestroy;
+        state = State.Flying;
     }
 
     // Update is called once per frame
     void Update()
     {
-        //missing synchronization with time
-        if (TTL > 0)
+        switch (state)
         {
-            if(TTL == initTTL - 5)
-            {
-                //collider = gameObject.AddComponent<PolygonCollider2D>();
-                //collider.edgeRadius = 0.1f;
-                //collider.
-                circleCol = gameObject.AddComponent<CircleCollider2D>();
-                circleCol.radius = 0.1f;
-                rigid = gameObject.AddComponent<Rigidbody2D>();
-            }
-            float dx = initDX;
-            float lastY = GetY(lastX);
-            float nextY = GetY(lastX + dx);
-            while (new Vector2(dx, nextY - lastY).magnitude > length)
-            {
-                dx = 0.9f * dx;
-                nextY = GetY(lastX + dx);
-            }
-            lastX += dx;
-            TTL--;
-            float dy = nextY - lastY;
-            float angle = Mathf.Atan2(dy, isRight*dx);
-            //lastLocation += new Vector3(isRight*dx, dy);
-            lastLocation = new Vector3(isRight * lastX, GetY(lastX)) + initLocation - offsetY;
-            drawer.UpdateLocationAndAngle(lastLocation, angle);
-            gameObject.GetComponent<Transform>().position = lastLocation;
-        }
-        else
-        {
-            if(goDestroy)
-            {
+            case State.NotEvenAlive:
+                break;
+            case State.Flying:
+                if (TTL == initTTL - 10)
+                {
+                    circleCol = gameObject.AddComponent<CircleCollider2D>();
+                    circleCol.radius = 0.1f;
+                    rigid = gameObject.AddComponent<Rigidbody2D>();
+                }
+                float dx = initDX;
+                float lastY = GetY(lastX);
+                float nextY = GetY(lastX + dx);
+                while (new Vector2(dx, nextY - lastY).magnitude > length)
+                {
+                    dx = 0.9f * dx;
+                    nextY = GetY(lastX + dx);
+                }
+                lastX += dx;
+                TTL--;
+                float dy = nextY - lastY;
+                float angle = Mathf.Atan2(dy, isRight * dx);
+                lastLocation = new Vector3(isRight * lastX, GetY(lastX)) + initLocation - offsetY;
+                drawer.UpdateLocationAndAngle(lastLocation, angle);
+                gameObject.GetComponent<Transform>().position = lastLocation;
+                if (TTL < 0)
+                {
+                    Explode();
+                }
+                break;
+            case State.Exploding:
+                if(TTL >= explosionTTL/2)
+                {
+                    explosion.Raise();
+                }
+                else
+                {
+                    explosion.Lower();
+                }
+                TTL--;
+                if (TTL < 1)
+                {
+                    state = State.Dying;
+                    Destroy(explosion);
+                }
+                break;
+            case State.Dying:
                 Destroy(rigid);
                 Destroy(drawer);
                 toDestroy();
-            }
+                break;
         }
+
     }
 
     private float GetY(float x)
@@ -95,22 +122,30 @@ public class ProjectileLogic : MonoBehaviour
         return (float)equation.With("x", x).GetValue();
     }
 
+    private void Explode()
+    {
+        TTL = explosionTTL;
+        state = State.Exploding;
+        alreadyHit = true;
+        explosion = gameObject.AddComponent<ExplosionLogic>();
+        explosion.AddData(lastLocation, () => { });
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(!alreadyHit)
+        if (state == State.Flying)
         {
             Debug.Log("hit sth");
-            TTL = 0;
-            alreadyHit = true;
-
-            //logic for dealing damage
-            //float radius = 10;
-            /*FindObjectsOfType(typeof(GameObject))
-                .Cast<GameObject>()
-                .Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
-                .Where(gameObj => (gameObj.GetComponent<Transform>().position - lastLocation).magnitude < radius)
-                .ToList()
-                .ForEach()*/
+            Explode();
         }
+
+        //logic for dealing damage
+        //float radius = 10;
+        /*FindObjectsOfType(typeof(GameObject))
+            .Cast<GameObject>()
+            .Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
+            .Where(gameObj => (gameObj.GetComponent<Transform>().position - lastLocation).magnitude < radius)
+            .ToList()
+            .ForEach()*/
     }
 }
