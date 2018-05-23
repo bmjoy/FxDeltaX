@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour {
     private Dictionary<Team, Color> teamColors;
     private Team activeTeam;
     private Dictionary<Team, int> characterIdxs;
+    private Dictionary<Team, Dictionary<int, int>> hp;
 
     private Timer timer;
 
@@ -41,6 +42,7 @@ public class GameManager : MonoBehaviour {
     private const int playersQty = 2;
     private const int teamsQty = 2;
     private const int serieTime = 30;
+    private const int startingHp = 100;
 
 
     public static GameObject GetCurrentCharacter()
@@ -76,11 +78,15 @@ public class GameManager : MonoBehaviour {
     {
         teams = new Dictionary<Team, List<GameObject>>();
         characterIdxs = new Dictionary<Team, int>();
+        hp = new Dictionary<Team, Dictionary<int, int>>();
 
         foreach (Team team in System.Enum.GetValues(typeof(Team)))
         {
             teams[team] = new List<GameObject>();
             characterIdxs[team] = 0;
+            hp[team] = new Dictionary<int, int>();
+            for (int i = 0; i < playersQty; ++i)
+                hp[team][i] = startingHp;
         }
     }
 
@@ -165,6 +171,7 @@ public class GameManager : MonoBehaviour {
     private void enableCharacter(Team team, int idx)
     {
         currentCharacter = teams[team][idx];
+        Debug.Log("Current player hp: " + hp[team][idx].ToString());
         foreach (Team t in System.Enum.GetValues(typeof(Team)))
         {
             for(int i=0; i<teams[t].Count; i++)
