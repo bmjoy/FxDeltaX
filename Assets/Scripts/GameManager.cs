@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets._2D;
@@ -33,6 +32,7 @@ public class GameManager : MonoBehaviour {
     private Dictionary<Team, int> characterIdxs;
 
     private Timer timer;
+    private int timeLeft;
 
     private State state = State.TEAM_PREPARATION;
     private PlayerMode playerMode = PlayerMode.MOVING;
@@ -54,6 +54,11 @@ public class GameManager : MonoBehaviour {
         return instance.playerMode;
     }
 
+    public static int GetRoundLeftTime()
+    {
+        return instance.timeLeft;
+    }
+
 	// Use this for initialization
 	void Awake ()
     {
@@ -71,6 +76,7 @@ public class GameManager : MonoBehaviour {
         };
         createTeams(teamsQty);
         activeTeam = Team.ALPHA;
+        timer = new Timer(new TimerCallback(OnTimerTick));
     }
 
     private void createTeams(int players)
@@ -139,6 +145,8 @@ public class GameManager : MonoBehaviour {
             UpdateCharacterOnModeChange();
             Debug.Log("Player mode changed to " + playerMode.ToString());
         }
+        if (timeLeft == 0)
+            StartNewSerie();
     }
 
     private void prepareToGameplay()
@@ -146,7 +154,6 @@ public class GameManager : MonoBehaviour {
         state = State.GAMEPLAY;
         Camera.main.GetComponent<CameraController>().Enable(true);
         enableCharacter(activeTeam, characterIdxs[activeTeam]);
-        this.InvokeRepeating("OnRoundFinished", serieTime, serieTime);
     }
 
     private bool isCurrentTeamFullyCreated()
@@ -182,11 +189,19 @@ public class GameManager : MonoBehaviour {
         teams[activeTeam][characterIdxs[activeTeam]].GetComponent<Platformer2DUserControl>().enabled = (playerMode == PlayerMode.MOVING);
     }
 
-    private void OnRoundFinished()
+    private void StartNewSerie()
     {
         characterIdxs[activeTeam] = (characterIdxs[activeTeam] + 1) % teams[activeTeam].Count;
         activeTeam = activeTeam.Next();
         enableCharacter(activeTeam, characterIdxs[activeTeam]);
         playerMode = PlayerMode.MOVING;
+        timer.Change(1000, 1000);
+        timeLeft = serieTime;
+    }
+
+    private void OnTimerTick(System.Object stateInfo)
+    {
+        if (timeLeft > 0)
+            --timeLeft;
     }
 }

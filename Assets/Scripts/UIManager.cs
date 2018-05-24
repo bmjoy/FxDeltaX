@@ -8,14 +8,14 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
 
-    private InputField equationInput;
+    public InputField equationInput;
+    public Text timeLeftText;
 
     void Start ()
     {
-        equationInput = Canvas.FindObjectOfType<InputField>();
     }
 
-    void Update ()
+    void FixedUpdate ()
     {
         var playerMode = GameManager.GetPlayerMode();
         bool showCanvas = (playerMode == PlayerMode.SHOOTING);
@@ -23,5 +23,7 @@ public class UIManager : MonoBehaviour
         equationInput.gameObject.SetActive(showCanvas);
         equationInput.Select();
         equationInput.ActivateInputField();
+
+        timeLeftText.text = GameManager.GetRoundLeftTime().ToString();
     }
 }
