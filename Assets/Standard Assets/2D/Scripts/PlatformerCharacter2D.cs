@@ -30,6 +30,12 @@ namespace UnityStandardAssets._2D
         {
             return hp;
         }
+
+        public Animator getAnim()
+        {
+            return m_Anim;
+        }
+
         private void Awake()
         {
             // Setting up references.

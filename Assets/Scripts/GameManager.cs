@@ -146,7 +146,10 @@ public class GameManager : MonoBehaviour {
             Debug.Log("Player mode changed to " + playerMode.ToString());
         }
         if (timeLeft == 0)
+        {
+            teams[activeTeam][characterIdxs[activeTeam]].GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
             StartNewSerie();
+        }
     }
 
     private void prepareToGameplay()
