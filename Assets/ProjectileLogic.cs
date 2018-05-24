@@ -140,12 +140,12 @@ public class ProjectileLogic : MonoBehaviour
         }
 
         //logic for dealing damage
-        //float radius = 10;
-        /*FindObjectsOfType(typeof(GameObject))
+        float radius = 1;
+        FindObjectsOfType(typeof(GameObject))
             .Cast<GameObject>()
             .Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
             .Where(gameObj => (gameObj.GetComponent<Transform>().position - lastLocation).magnitude < radius)
             .ToList()
-            .ForEach()*/
+            .ForEach(i => i.GetComponent<PlatformerCharacter2D>().Hit());
     }
 }
