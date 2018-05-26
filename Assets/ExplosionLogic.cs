@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityStandardAssets._2D;
 using UnityEngine;
 using System.Linq;
+using Assets;
 
 public class ExplosionLogic : MonoBehaviour
 {
@@ -18,20 +19,16 @@ public class ExplosionLogic : MonoBehaviour
     CircleCollider2D circleCol;
     //PolygonCollider2D collider;
     Vector3 location;
+    private const float dr = 0.05f;
     float radius;
     System.Action toDestroy;
 
     static readonly Vector3 offset = new Vector3(0, 0, 1);
-    /*int TTL = -1;
-    float lastX = -1.0f;
-    Vector3 offsetY;
-    float initDX;
-    bool alreadyHit = false;
-    State state = State.NotEvenAlive;
-    float length = 0.3f;
-    float isRight = 0.0f;
-    int initTTL = 200;
-    bool goDestroy = false;*/
+
+    float power;
+
+    List<GameObject> alreadyHit = new List<GameObject>();
+    
     Dictionary<string, double> values = new Dictionary<string, double>() { { "x", 0f } };
     // Use this for initialization
     void Start()
@@ -40,8 +37,14 @@ public class ExplosionLogic : MonoBehaviour
         drawer = gameObject.AddComponent<ExplosionDrawer>();
     }
 
-    public void AddData(Vector3 location, System.Action toDestroy)
+    float dmgToDeal()
     {
+        return power / radius * dr; // ProjectileLogic.power2explosionTTL;
+    }
+
+    public void AddData(Vector3 location, float power, System.Action toDestroy)
+    {
+        this.power = power;
         this.location = location;
         this.toDestroy = toDestroy;
         circleCol = gameObject.AddComponent<CircleCollider2D>();
@@ -59,12 +62,12 @@ public class ExplosionLogic : MonoBehaviour
 
     public void Raise()
     {
-        radius += 0.05f;
+        radius += dr;
     }
 
     public void Lower()
     {
-        radius -= 0.05f;
+        radius -= dr;
     }
 
     private Vector3[] Radius2PerimeterVec(float radius)
@@ -87,7 +90,16 @@ public class ExplosionLogic : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-
+        GameObject collidedWith = collision.gameObject;
+        HpComponent hpComponent = collidedWith.GetComponent<HpComponent>();
+        if(hpComponent != null)
+        {
+            if(!alreadyHit.Contains(collidedWith))
+            {
+                alreadyHit.Add(collidedWith);
+                hpComponent.Dec(dmgToDeal());
+            }
+        }
     }
 
     private void OnDestroy()
