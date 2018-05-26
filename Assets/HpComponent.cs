@@ -10,7 +10,7 @@ namespace Assets
     {
         protected override void WhenBelowOrEqualZero()
         {
-            //throw new NotImplementedException();
+            GameManager.instance.KillCharacter(gameObject);
         }
 
 

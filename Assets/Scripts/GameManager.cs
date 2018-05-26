@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using UnityStandardAssets._2D;
 using Assets;
 using UnityEngine.SceneManagement;
@@ -26,13 +27,14 @@ public class GameManager : MonoBehaviour {
         BETA
     };
 
+    public static readonly int POWER_MULTIPLICATOR = 100;
+
     public static GameManager instance = null;
     public GameObject currentCharacter;
 
-    private Dictionary<Team, List<GameObject>> teams;
+    private Dictionary<Team, Queue<GameObject>> teams;
     private Dictionary<Team, Color> teamColors;
     private Team activeTeam;
-    private Dictionary<Team, int> characterIdxs;
 
     private Timer timer;
     private int timeLeft;
@@ -93,13 +95,11 @@ public class GameManager : MonoBehaviour {
 
     private void createTeams(int players)
     {
-        teams = new Dictionary<Team, List<GameObject>>();
-        characterIdxs = new Dictionary<Team, int>();
+        teams = new Dictionary<Team, Queue<GameObject>>();
 
         foreach (Team team in System.Enum.GetValues(typeof(Team)))
         {
-            teams[team] = new List<GameObject>();
-            characterIdxs[team] = 0;
+            teams[team] = new Queue<GameObject>();
         }
     }
 
@@ -123,8 +123,8 @@ public class GameManager : MonoBehaviour {
 
             teamColors = new Dictionary<Team, Color>()
             {
-                {Team.ALPHA, new Color(1,0,0)},
-                {Team.BETA, new Color(0,0,1)}
+                {Team.ALPHA, Color.red},
+                {Team.BETA, Color.blue}
             };
 
             createTeams(teamsQty);
@@ -151,18 +151,9 @@ public class GameManager : MonoBehaviour {
             var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos.z = 0;
 
-            GameObject character = (GameObject)Instantiate(Resources.Load("CharacterRobotBoy"), mousePos, transform.rotation);
-            character.GetComponent<Platformer2DUserControl>().enabled = false;
-            var hpComp = character.AddComponent<Assets.HpComponent>();
-            hpComp.SetInit(100);
-            var staminaComp = character.AddComponent<Assets.StaminaComponent>();
-            staminaComp.SetInit(100);
-            staminaComp.Set(0);
+            var character = CreateCharacter(mousePos, activeTeam);
    
-            var characterRenderer = character.GetComponent<Renderer>();
-            characterRenderer.material.color = teamColors[activeTeam];
-
-            teams[activeTeam].Add(character);
+            teams[activeTeam].Enqueue(character);
             characterPlacing = true;
             currentCharacter = character;
         }
@@ -190,8 +181,8 @@ public class GameManager : MonoBehaviour {
         }
         if (timeLeft == 0)
         {
-            teams[activeTeam][characterIdxs[activeTeam]].GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
-            StartNewSerie();
+            currentCharacter.GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
+            StartNewRound();
         }
     }
 
@@ -199,7 +190,6 @@ public class GameManager : MonoBehaviour {
     {
         state = State.GAMEPLAY;
         Camera.main.GetComponent<CameraController>().Enable(true);
-        enableCharacter(activeTeam, characterIdxs[activeTeam]);
     }
 
     private bool isCurrentTeamFullyCreated()
@@ -216,36 +206,97 @@ public class GameManager : MonoBehaviour {
         return teamsFull;
     }
 
-    private void enableCharacter(Team team, int idx)
+    private void enableCurrentCharacter()
     {
-        currentCharacter = teams[team][idx];
-        //Debug.Log("Current player hp: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().showHp().ToString());
-        //Debug.Log("Current player stamina: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().stamina.ToString());
         foreach (Team t in System.Enum.GetValues(typeof(Team)))
         {
-            for(int i=0; i<teams[t].Count; i++)
+            foreach(GameObject gameObj in teams[t])
             {
-                bool current = (i == idx) && (t == team);
-                teams[t][i].GetComponent<Platformer2DUserControl>().enabled = current;
+                gameObj.GetComponent<Platformer2DUserControl>().enabled = currentCharacter.Equals(gameObj);
             }
         }
     }
 
     private void UpdateCharacterOnModeChange()
     {
-        teams[activeTeam][characterIdxs[activeTeam]].GetComponent<Platformer2DUserControl>().enabled = (playerMode == PlayerMode.MOVING);
-        teams[activeTeam][characterIdxs[activeTeam]].GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
+        currentCharacter.GetComponent<Platformer2DUserControl>().enabled = (playerMode == PlayerMode.MOVING);
+        currentCharacter.GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
     }
 
-    private void StartNewSerie()
+    private void StartNewRound()
     {
-        characterIdxs[activeTeam] = (characterIdxs[activeTeam] + 1) % teams[activeTeam].Count;
         activeTeam = activeTeam.Next();
-        enableCharacter(activeTeam, characterIdxs[activeTeam]);
+        if(!teams[activeTeam].Any())
+        {
+            EndGame();
+            return;
+        }
+        currentCharacter = teams[activeTeam].Dequeue();
+        teams[activeTeam].Enqueue(currentCharacter);
+        enableCurrentCharacter();
         playerMode = PlayerMode.MOVING;
         currentCharacter.GetComponent<StaminaComponent>().Set(100);
         timer.Change(1000, 1000);
         timeLeft = serieTime;
+    }
+
+
+    public void KillCharacter(GameObject characterToKill)
+    {
+        if(currentCharacter.Equals(characterToKill))
+        {
+          //  throw new System.Exception("kiled yourself, need to handle that");
+        }
+        /*foreach(var teamQueuePair in teams)
+        {
+            var queue = teamQueuePair.Value;
+            if(queue.Contains(characterToKill))
+            {
+                var newQueue = new Queue<GameObject>();
+                foreach(var character in queue)
+                {
+                    if(!character.Equals(characterToKill))
+                    {
+                        newQueue.Enqueue(character);
+                    }
+                }
+                
+                teams[teamQueuePair.Key] = newQueue;
+            }
+        }*/
+        foreach(var team in new Team[] { Team.ALPHA, Team.BETA})
+        {
+            var newQueue = new Queue<GameObject>();
+            while(teams[team].Any())
+            {
+                var character = teams[team].Dequeue();
+                if(!character.Equals(characterToKill))
+                {
+                    newQueue.Enqueue(character);
+                }
+                else
+                {
+                    Destroy(character);
+                }
+            }
+            teams[team] = newQueue;
+        }
+    }
+
+    private GameObject CreateCharacter(Vector3 whereToCreate, Team team)
+    {
+        GameObject character = (GameObject)Instantiate(Resources.Load("CharacterRobotBoy"), whereToCreate, transform.rotation);
+        character.GetComponent<Platformer2DUserControl>().enabled = false;
+        var hpComp = character.AddComponent<Assets.HpComponent>();
+        hpComp.SetInit(100);
+        var staminaComp = character.AddComponent<Assets.StaminaComponent>();
+        staminaComp.SetInit(100);
+        staminaComp.Set(0);
+
+        var characterRenderer = character.GetComponent<Renderer>();
+        characterRenderer.material.color = teamColors[team];
+
+        return character;
     }
 
     private void OnTimerTick(System.Object stateInfo)

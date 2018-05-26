@@ -145,7 +145,7 @@ public class ProjectileLogic : MonoBehaviour
         state = State.Exploding;
         alreadyHit = true;
         explosion = gameObject.AddComponent<ExplosionLogic>();
-        explosion.AddData(lastLocation, power, () => { });
+        explosion.AddData(lastLocation, power * GameManager.POWER_MULTIPLICATOR, () => { });
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
