@@ -229,6 +229,7 @@ public class GameManager : MonoBehaviour {
     private void UpdateCharacterOnModeChange()
     {
         teams[activeTeam][characterIdxs[activeTeam]].GetComponent<Platformer2DUserControl>().enabled = (playerMode == PlayerMode.MOVING);
+        teams[activeTeam][characterIdxs[activeTeam]].GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
     }
 
     private void StartNewSerie()
