@@ -10,6 +10,7 @@ public class ProjectileLogic : MonoBehaviour
     private enum State
     {
         NotEvenAlive,
+        DontHitYourself,
         Flying,
         Exploding,
         Dying
@@ -33,8 +34,10 @@ public class ProjectileLogic : MonoBehaviour
     float length = 0.3f;
     float isRight = 0.0f;
     float power;
-    int initTTL = 200;
+    int dontHitTTL = 5;
+    int flyTTL = 100;
     int explosionTTL = 40;
+    public static int power2explosionTTL = 2;
     bool goDestroy = false;
     Dictionary<string, double> values = new Dictionary<string, double>() { { "x", 0f } };
     // Use this for initialization
@@ -49,7 +52,6 @@ public class ProjectileLogic : MonoBehaviour
         this.initLocation = initLocation;
         this.lastLocation = initLocation;
         this.equation = equation;
-        TTL = initTTL;
         lastX = 0.0f;
         // initDX = 0.5f * (looksRight ? 1 : -1);
         offsetY = new Vector3(0, GetY(lastX));
@@ -57,8 +59,10 @@ public class ProjectileLogic : MonoBehaviour
         isRight = looksRight ? 1 : -1;
         goDestroy = true;
         this.toDestroy = toDestroy;
-        state = State.Flying;
+        TTL = dontHitTTL;
+        state = State.DontHitYourself;
         this.power = power;
+        explosionTTL = power2explosionTTL * (int)power;
     }
 
     // Update is called once per frame
@@ -68,28 +72,19 @@ public class ProjectileLogic : MonoBehaviour
         {
             case State.NotEvenAlive:
                 break;
-            case State.Flying:
-                if (TTL == initTTL - 10)
+            case State.DontHitYourself:
+                MoveProjectile();
+                if(TTL < 0)
                 {
                     circleCol = gameObject.AddComponent<CircleCollider2D>();
-                    circleCol.radius = 0.1f;
+                    circleCol.radius = 0.01f;
                     rigid = gameObject.AddComponent<Rigidbody2D>();
+                    TTL = flyTTL;
+                    state = State.Flying;
                 }
-                float dx = initDX;
-                float lastY = GetY(lastX);
-                float nextY = GetY(lastX + dx);
-                while (new Vector2(dx, nextY - lastY).magnitude > length)
-                {
-                    dx = 0.9f * dx;
-                    nextY = GetY(lastX + dx);
-                }
-                lastX += dx;
-                TTL--;
-                float dy = nextY - lastY;
-                float angle = Mathf.Atan2(dy, isRight * dx);
-                lastLocation = new Vector3(isRight * lastX, GetY(lastX)) + initLocation - offsetY;
-                drawer.UpdateLocationAndAngle(lastLocation, angle);
-                gameObject.GetComponent<Transform>().position = lastLocation;
+                break;
+            case State.Flying:
+                MoveProjectile();
                 if (TTL < 0)
                 {
                     Explode();
@@ -120,6 +115,25 @@ public class ProjectileLogic : MonoBehaviour
 
     }
 
+    private void MoveProjectile()
+    {
+        float dx = initDX;
+        float lastY = GetY(lastX);
+        float nextY = GetY(lastX + dx);
+        while (new Vector2(dx, nextY - lastY).magnitude > length)
+        {
+            dx = 0.9f * dx;
+            nextY = GetY(lastX + dx);
+        }
+        lastX += dx;
+        TTL--;
+        float dy = nextY - lastY;
+        float angle = Mathf.Atan2(dy, isRight * dx);
+        lastLocation = new Vector3(isRight * lastX, GetY(lastX)) + initLocation - offsetY;
+        drawer.UpdateLocationAndAngle(lastLocation, angle);
+        gameObject.GetComponent<Transform>().position = lastLocation;
+    }
+
     private float GetY(float x)
     {
         return (float)equation.With("x", x).GetValue();
@@ -131,7 +145,7 @@ public class ProjectileLogic : MonoBehaviour
         state = State.Exploding;
         alreadyHit = true;
         explosion = gameObject.AddComponent<ExplosionLogic>();
-        explosion.AddData(lastLocation, () => { });
+        explosion.AddData(lastLocation, power, () => { });
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -144,15 +158,13 @@ public class ProjectileLogic : MonoBehaviour
             //logic for dealing damage
             //var stamina_left = GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina;
             //var stamina_left = GameManager.GetCurrentCharacter().GetComponent<StaminaComponent>().value;
-            //TODO: ZMIENIĆ NA BRANIE STAMINY W CZASIE SZCZAŁU, A NIE W DANYM MOMENCIE
 
-            float radius = 1;
-            FindObjectsOfType(typeof(GameObject))
+            /*FindObjectsOfType(typeof(GameObject))
                 .Cast<GameObject>()
                 .Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
                 .Where(gameObj => (gameObj.GetComponent<Transform>().position - lastLocation).magnitude < radius)
                 .ToList()
-                .ForEach(i => i.GetComponent<HpComponent>().Dec(power));
+                .ForEach(i => i.GetComponent<HpComponent>().Dec(power));*/
 
             //GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina = 0;
 
