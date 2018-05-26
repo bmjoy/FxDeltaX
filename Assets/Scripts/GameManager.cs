@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets._2D;
 using Assets;
+using UnityEngine.SceneManagement;
 
 public enum PlayerMode
 {
@@ -10,13 +11,14 @@ public enum PlayerMode
     SHOOTING
 };
 
-public class GameManager : MonoBehaviour {
+public enum State
+{
+    GAME_NOT_STARTED,
+    TEAM_PREPARATION,
+    GAMEPLAY
+};
 
-    private enum State
-    {
-        TEAM_PREPARATION,
-        GAMEPLAY
-    };
+public class GameManager : MonoBehaviour {
 
     private enum Team
     {
@@ -35,9 +37,10 @@ public class GameManager : MonoBehaviour {
     private Timer timer;
     private int timeLeft;
 
-    private State state = State.TEAM_PREPARATION;
+    private State state = State.GAME_NOT_STARTED;
     private PlayerMode playerMode = PlayerMode.MOVING;
     private bool characterPlacing = false;
+    private bool allowToStartGame = true;
 
     private static int playersQty = 4;
     private static int serieTime = 3;
@@ -60,6 +63,23 @@ public class GameManager : MonoBehaviour {
         return instance.timeLeft;
     }
 
+    public State GetGameState()
+    {
+        return instance.state;
+    }
+
+    public void StartNewGame()
+    {
+        allowToStartGame = true;
+    }
+
+    public void EndGame()
+    {
+        SceneManager.LoadScene("Menu");
+        state = State.GAME_NOT_STARTED;
+        allowToStartGame = false;
+    }
+
 	// Use this for initialization
 	void Awake ()
     {
@@ -69,18 +89,6 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
-
-        playersQty = GameSettings.instance.GetCharactersQty();
-        serieTime = GameSettings.instance.GetRoundTime();
-
-        teamColors = new Dictionary<Team, Color>()
-        {
-            {Team.ALPHA, new Color(1,0,0)},
-            {Team.BETA, new Color(0,0,1)}
-        };
-        createTeams(teamsQty);
-        activeTeam = Team.ALPHA;
-        timer = new Timer(new TimerCallback(OnTimerTick));
     }
 
     private void createTeams(int players)
@@ -98,10 +106,32 @@ public class GameManager : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        if (state == State.TEAM_PREPARATION)
+        if (state == State.GAME_NOT_STARTED)
+            UpdateOnGameNotStarted();
+        else if (state == State.TEAM_PREPARATION)
             UpdateOnTeamPreparation();
         else if (state == State.GAMEPLAY)
             UpdateOnGameplay();
+    }
+
+    private void UpdateOnGameNotStarted()
+    {
+        if(allowToStartGame)
+        {
+            playersQty = GameSettings.instance.GetCharactersQty();
+            serieTime = GameSettings.instance.GetRoundTime();
+
+            teamColors = new Dictionary<Team, Color>()
+            {
+                {Team.ALPHA, new Color(1,0,0)},
+                {Team.BETA, new Color(0,0,1)}
+            };
+
+            createTeams(teamsQty);
+            activeTeam = Team.ALPHA;
+            timer = new Timer(new TimerCallback(OnTimerTick));
+            state = State.TEAM_PREPARATION;
+        }
     }
 
     private void UpdateOnTeamPreparation()
@@ -154,6 +184,10 @@ public class GameManager : MonoBehaviour {
             UpdateCharacterOnModeChange();
             Debug.Log("Player mode changed to " + playerMode.ToString());
         }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EndGame();
+        }
         if (timeLeft == 0)
         {
             teams[activeTeam][characterIdxs[activeTeam]].GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
@@ -200,6 +234,7 @@ public class GameManager : MonoBehaviour {
     private void UpdateCharacterOnModeChange()
     {
         teams[activeTeam][characterIdxs[activeTeam]].GetComponent<Platformer2DUserControl>().enabled = (playerMode == PlayerMode.MOVING);
+        teams[activeTeam][characterIdxs[activeTeam]].GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
     }
 
     private void StartNewSerie()
