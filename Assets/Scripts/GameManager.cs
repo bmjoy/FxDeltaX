@@ -181,7 +181,7 @@ public class GameManager : MonoBehaviour {
         }
         if (timeLeft == 0)
         {
-            currentCharacter.GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
+            stopAnimationForCurrentCharacter();
             StartNewRound();
         }
     }
@@ -220,6 +220,11 @@ public class GameManager : MonoBehaviour {
     private void UpdateCharacterOnModeChange()
     {
         currentCharacter.GetComponent<Platformer2DUserControl>().enabled = (playerMode == PlayerMode.MOVING);
+        stopAnimationForCurrentCharacter();
+    }
+
+    private void stopAnimationForCurrentCharacter()
+    {
         currentCharacter.GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
     }
 
@@ -302,6 +307,9 @@ public class GameManager : MonoBehaviour {
     private void OnTimerTick(System.Object stateInfo)
     {
         if (timeLeft > 0)
+        {
             --timeLeft;
+            currentCharacter.GetComponent<StaminaComponent>().Dec(2);
+        }
     }
 }
