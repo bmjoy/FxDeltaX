@@ -38,9 +38,9 @@ public class GameManager : MonoBehaviour {
     private PlayerMode playerMode = PlayerMode.MOVING;
     private bool characterPlacing = false;
 
-    private const int playersQty = 2;
+    private static int playersQty = 4;
+    private static int serieTime = 30;
     private const int teamsQty = 2;
-    private const int serieTime = 3;
     private const int startingHp = 100;
 
 
@@ -68,6 +68,9 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
+
+        playersQty = GameSettings.instance.GetCharactersQty();
+        serieTime = GameSettings.instance.GetRoundTime();
 
         teamColors = new Dictionary<Team, Color>()
         {
