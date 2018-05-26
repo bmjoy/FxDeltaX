@@ -313,12 +313,14 @@ GameObject:
   m_Component:
   - component: {fileID: 92704168}
   - component: {fileID: 92704167}
+  - component: {fileID: 92704170}
+  - component: {fileID: 92704169}
   m_Layer: 1
   m_Name: underground_city
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!212 &92704167
 SpriteRenderer:
@@ -371,12 +373,52 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 92704166}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: -5.4, z: 100}
+  m_LocalPosition: {x: 4.8, y: -7, z: 100}
   m_LocalScale: {x: 15.367298, y: 15.022056, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!68 &92704169
+EdgeCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 92704166}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_EdgeRadius: 0
+  m_Points:
+  - {x: -4.520796, y: 2.2336185}
+  - {x: 4.502537, y: 2.2606769}
+  - {x: 4.5129046, y: -2.248772}
+  - {x: -4.4799395, y: -2.2503853}
+  - {x: -4.504084, y: 2.2123466}
+--- !u!50 &92704170
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 92704166}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 0.0001
+  m_LinearDrag: 0
+  m_AngularDrag: 0
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &185539516
 GameObject:
   m_ObjectHideFlags: 0
