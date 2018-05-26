@@ -140,12 +140,23 @@ public class ProjectileLogic : MonoBehaviour
         }
 
         //logic for dealing damage
+        var stamina_left = GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina;
+
         float radius = 1;
         FindObjectsOfType(typeof(GameObject))
             .Cast<GameObject>()
             .Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
             .Where(gameObj => (gameObj.GetComponent<Transform>().position - lastLocation).magnitude < radius)
             .ToList()
-            .ForEach(i => i.GetComponent<PlatformerCharacter2D>().Hit());
+            .ForEach(i => i.GetComponent<PlatformerCharacter2D>().Hit(stamina_left));
+
+        GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina = 0;
+
+        //var co = FindObjectsOfType(typeof(GameManager)).Cast<GameManager>().ToList()[0].GetCurrentCharacter();
+        
+            /*.Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
+            .Where(i => i.GetComponent<PlatformerCharacter2D>().currentCharacter)
+            .ToList()
+            .ForEach(i => i.GetComponent<PlatformerCharacter2D>().Hit());*/
     }
 }

@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour {
     private bool characterPlacing = false;
 
     private static int playersQty = 4;
-    private static int serieTime = 30;
+    private static int serieTime = 3;
     private const int teamsQty = 2;
     private const int startingHp = 100;
 
@@ -180,6 +180,7 @@ public class GameManager : MonoBehaviour {
     {
         currentCharacter = teams[team][idx];
         Debug.Log("Current player hp: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().showHp().ToString());
+        Debug.Log("Current player stamina: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().stamina.ToString());
         foreach (Team t in System.Enum.GetValues(typeof(Team)))
         {
             for(int i=0; i<teams[t].Count; i++)

@@ -20,10 +20,11 @@ namespace UnityStandardAssets._2D
         private Rigidbody2D m_Rigidbody2D;
         public bool m_FacingRight = true;  // For determining which way the player is currently facing.
         int hp = 100;
+        public int stamina = 100;
 
-        public void Hit()
+        public void Hit(int stamina_left)
         {
-            hp -= 10;
+            hp -= stamina_left;
         }
 
         public int showHp()
