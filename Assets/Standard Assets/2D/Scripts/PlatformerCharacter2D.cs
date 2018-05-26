@@ -19,18 +19,6 @@ namespace UnityStandardAssets._2D
         private Animator m_Anim;            // Reference to the player's animator component.
         private Rigidbody2D m_Rigidbody2D;
         public bool m_FacingRight = true;  // For determining which way the player is currently facing.
-        int hp = 100;
-        public int stamina = 100;
-
-        public void Hit(int stamina_left)
-        {
-            hp -= stamina_left;
-        }
-
-        public int showHp()
-        {
-            return hp;
-        }
 
         public Animator getAnim()
         {

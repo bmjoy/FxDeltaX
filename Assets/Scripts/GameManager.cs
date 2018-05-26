@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets._2D;
+using Assets;
 
 public enum PlayerMode
 {
@@ -41,7 +42,7 @@ public class GameManager : MonoBehaviour {
     private static int playersQty = 4;
     private static int serieTime = 3;
     private const int teamsQty = 2;
-    private const int startingHp = 100;
+    //private  const int startingHp = 100;
 
 
     public static GameObject GetCurrentCharacter()
@@ -122,6 +123,11 @@ public class GameManager : MonoBehaviour {
 
             GameObject character = (GameObject)Instantiate(Resources.Load("CharacterRobotBoy"), mousePos, transform.rotation);
             character.GetComponent<Platformer2DUserControl>().enabled = false;
+            var hpComp = character.AddComponent<Assets.HpComponent>();
+            hpComp.SetInit(100);
+            var staminaComp = character.AddComponent<Assets.StaminaComponent>();
+            staminaComp.SetInit(100);
+            staminaComp.Set(0);
    
             var characterRenderer = character.GetComponent<Renderer>();
             characterRenderer.material.color = teamColors[activeTeam];
@@ -179,8 +185,8 @@ public class GameManager : MonoBehaviour {
     private void enableCharacter(Team team, int idx)
     {
         currentCharacter = teams[team][idx];
-        Debug.Log("Current player hp: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().showHp().ToString());
-        Debug.Log("Current player stamina: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().stamina.ToString());
+        //Debug.Log("Current player hp: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().showHp().ToString());
+        //Debug.Log("Current player stamina: " + teams[team][idx].GetComponent<PlatformerCharacter2D>().stamina.ToString());
         foreach (Team t in System.Enum.GetValues(typeof(Team)))
         {
             for(int i=0; i<teams[t].Count; i++)
@@ -202,6 +208,7 @@ public class GameManager : MonoBehaviour {
         activeTeam = activeTeam.Next();
         enableCharacter(activeTeam, characterIdxs[activeTeam]);
         playerMode = PlayerMode.MOVING;
+        currentCharacter.GetComponent<StaminaComponent>().Set(100);
         timer.Change(1000, 1000);
         timeLeft = serieTime;
     }

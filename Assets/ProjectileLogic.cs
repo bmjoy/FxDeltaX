@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityStandardAssets._2D;
 using UnityEngine;
 using System.Linq;
+using Assets;
 
 public class ProjectileLogic : MonoBehaviour
 {
@@ -31,6 +32,7 @@ public class ProjectileLogic : MonoBehaviour
     State state = State.NotEvenAlive;
     float length = 0.3f;
     float isRight = 0.0f;
+    float power;
     int initTTL = 200;
     int explosionTTL = 40;
     bool goDestroy = false;
@@ -42,7 +44,7 @@ public class ProjectileLogic : MonoBehaviour
         drawer = gameObject.AddComponent<ProjectileDrawer>();
     }
 
-    public void AddData(Vector3 initLocation, Text2AST.Equation equation, bool looksRight, System.Action toDestroy)
+    public void AddData(Vector3 initLocation, Text2AST.Equation equation, bool looksRight, float power, System.Action toDestroy)
     {
         this.initLocation = initLocation;
         this.lastLocation = initLocation;
@@ -56,6 +58,7 @@ public class ProjectileLogic : MonoBehaviour
         goDestroy = true;
         this.toDestroy = toDestroy;
         state = State.Flying;
+        this.power = power;
     }
 
     // Update is called once per frame
@@ -137,26 +140,28 @@ public class ProjectileLogic : MonoBehaviour
         {
             Debug.Log("hit sth");
             Explode();
-        }
 
-        //logic for dealing damage
-        var stamina_left = GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina;
+            //logic for dealing damage
+            //var stamina_left = GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina;
+            //var stamina_left = GameManager.GetCurrentCharacter().GetComponent<StaminaComponent>().value;
+            //TODO: ZMIENIĆ NA BRANIE STAMINY W CZASIE SZCZAŁU, A NIE W DANYM MOMENCIE
 
-        float radius = 1;
-        FindObjectsOfType(typeof(GameObject))
-            .Cast<GameObject>()
-            .Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
-            .Where(gameObj => (gameObj.GetComponent<Transform>().position - lastLocation).magnitude < radius)
-            .ToList()
-            .ForEach(i => i.GetComponent<PlatformerCharacter2D>().Hit(stamina_left));
+            float radius = 1;
+            FindObjectsOfType(typeof(GameObject))
+                .Cast<GameObject>()
+                .Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
+                .Where(gameObj => (gameObj.GetComponent<Transform>().position - lastLocation).magnitude < radius)
+                .ToList()
+                .ForEach(i => i.GetComponent<HpComponent>().Dec(power));
 
-        GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina = 0;
+            //GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().stamina = 0;
 
-        //var co = FindObjectsOfType(typeof(GameManager)).Cast<GameManager>().ToList()[0].GetCurrentCharacter();
-        
+            //var co = FindObjectsOfType(typeof(GameManager)).Cast<GameManager>().ToList()[0].GetCurrentCharacter();
+
             /*.Where(gameObj => gameObj.GetComponent<PlatformerCharacter2D>() != null)
             .Where(i => i.GetComponent<PlatformerCharacter2D>().currentCharacter)
             .ToList()
             .ForEach(i => i.GetComponent<PlatformerCharacter2D>().Hit());*/
+        }
     }
 }
