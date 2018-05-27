@@ -21,13 +21,13 @@ public enum State
     WAIT_FOR_ROUND_START
 };
 
-public class GameManager : MonoBehaviour {
+public enum Team
+{
+    ALPHA,
+    BRAVO
+};
 
-    private enum Team
-    {
-        ALPHA,
-        BETA
-    };
+public class GameManager : MonoBehaviour {
 
     public static readonly int POWER_MULTIPLICATOR = 100;
 
@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour {
     private Dictionary<Team, Queue<GameObject>> teams;
     private Dictionary<Team, Color> teamColors;
     private Team activeTeam;
+
+    private Team winnerTeam;
 
     private Timer timer;
     private int waitForRoundTimeLeft;
@@ -75,6 +77,11 @@ public class GameManager : MonoBehaviour {
         return instance.state;
     }
 
+    public static Team GetWinnerTeam()
+    {
+        return instance.winnerTeam;
+    }
+
     public void StartNewGame()
     {
         allowToStartGame = true;
@@ -82,6 +89,12 @@ public class GameManager : MonoBehaviour {
 
     public void EndGame()
     {
+        foreach (Team team in System.Enum.GetValues(typeof(Team)))
+        {
+            if (teams[team].Count != 0)
+                winnerTeam = team;
+        }
+
         SceneManager.LoadScene("Menu");
         state = State.GAME_NOT_STARTED;
         allowToStartGame = false;
@@ -133,7 +146,7 @@ public class GameManager : MonoBehaviour {
             teamColors = new Dictionary<Team, Color>()
             {
                 {Team.ALPHA, Color.red},
-                {Team.BETA, Color.blue}
+                {Team.BRAVO, Color.blue}
             };
 
             createTeams(teamsQty);
@@ -321,7 +334,7 @@ public class GameManager : MonoBehaviour {
                 teams[teamQueuePair.Key] = newQueue;
             }
         }*/
-        foreach(var team in new Team[] { Team.ALPHA, Team.BETA})
+        foreach (Team team in System.Enum.GetValues(typeof(Team)))
         {
             var newQueue = new Queue<GameObject>();
             while(teams[team].Any())
