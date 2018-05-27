@@ -72,8 +72,12 @@ public class EquationScript : MonoBehaviour {
         newLineGen = Instantiate(lineGeneratorPrefab);
     }
 	// Update is called once per frame
-	void Update () {
-        if(equation != null && GameManager.GetPlayerMode() == PlayerMode.SHOOTING)
+	void Update ()
+    {
+        bool playerModeShooting = GameManager.GetPlayerMode() == PlayerMode.SHOOTING;
+        bool gameplayState = GameManager.GetGameState() == State.GAMEPLAY;
+
+        if(equation != null && playerModeShooting && gameplayState)
         {
             //Debug.Log(equation.GetValue());
                 DrawTrajectory();
