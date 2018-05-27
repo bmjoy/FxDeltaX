@@ -13,6 +13,13 @@ namespace Assets
             GameManager.instance.KillCharacter(gameObject);
         }
 
+        public override void Dec(float dv)
+        {
+            base.Dec(dv);
+            StaminaComponent staminaComp = GetComponent<StaminaComponent>();
+            staminaComp.Set(-1);
+        }
+
 
         protected override Material GetMaterial()
         {

@@ -86,15 +86,19 @@ public class EquationScript : MonoBehaviour {
 
     void DrawTrajectory()
     {
-        bool isRight = GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().m_FacingRight;
-        Vector3 location = GameManager.GetCurrentCharacter().GetComponent<Transform>().position;
+        var currChar = GameManager.GetCurrentCharacter();
+        if(currChar != null)
+        {
+            bool isRight = GameManager.GetCurrentCharacter().GetComponent<PlatformerCharacter2D>().m_FacingRight;
+            Vector3 location = GameManager.GetCurrentCharacter().GetComponent<Transform>().position;
 
-        LineRenderer lRend = newLineGen.GetComponent<LineRenderer>();
+            LineRenderer lRend = newLineGen.GetComponent<LineRenderer>();
 
-        lRend.widthMultiplier = 0.3f;
+            lRend.widthMultiplier = 0.3f;
 
-        lRend.positionCount = createdTrajectory.Count;
-        lRend.SetPositions(createdTrajectory.Select(vec => new Vector3(isRight ? vec.x : -vec.x, vec.y, vec.z) + location).ToArray());
+            lRend.positionCount = createdTrajectory.Count;
+            lRend.SetPositions(createdTrajectory.Select(vec => new Vector3(isRight ? vec.x : -vec.x, vec.y, vec.z) + location).ToArray());
+        }
     }
 
     void ClearTrajectory()

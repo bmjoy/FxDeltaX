@@ -227,7 +227,10 @@ public class GameManager : MonoBehaviour {
 
     private void stopAnimationForCurrentCharacter()
     {
-        currentCharacter.GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
+        if(currentCharacter != null)
+        {
+            currentCharacter.GetComponent<PlatformerCharacter2D>().getAnim().SetFloat("Speed", 0f);
+        }
     }
 
     private void StartNewRound()
@@ -303,6 +306,7 @@ public class GameManager : MonoBehaviour {
         staminaComp.Set(0);
 
         character.AddComponent<Assets.EquationScriptComponent>();
+        character.AddComponent<Assets.FallingHitter>();
 
         var characterRenderer = character.GetComponent<Renderer>();
         characterRenderer.material.color = teamColors[team];

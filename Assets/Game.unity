@@ -315,6 +315,7 @@ GameObject:
   - component: {fileID: 92704167}
   - component: {fileID: 92704170}
   - component: {fileID: 92704169}
+  - component: {fileID: 92704171}
   m_Layer: 1
   m_Name: underground_city
   m_TagString: Untagged
@@ -419,6 +420,17 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &92704171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 92704166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba74d90c8f58454d9902d4cd45fb50b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &185539516
 GameObject:
   m_ObjectHideFlags: 0
@@ -1181,6 +1193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca0162cce89be7b42a863c76fd76e05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  projectile: {fileID: 0}
 --- !u!4 &942978410
 Transform:
   m_ObjectHideFlags: 0

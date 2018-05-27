@@ -10,14 +10,23 @@ public abstract class BarComponent : MonoBehaviour {
         UpdateValue(this.value + dv);
     }
 
-    public void Dec(float dv)
+    public virtual void Dec(float dv)
     {
         UpdateValue(this.value - dv);
     }
 
     public void Set(float newValue)
     {
-        UpdateValue(newValue);
+        float dv = newValue - value;
+        if(dv > 0)
+        {
+            Inc(dv);
+        }
+        else
+        {
+            Dec(-dv);
+        }
+        //UpdateValue(newValue);
     }
 
     protected abstract void WhenBelowOrEqualZero();
