@@ -241,6 +241,8 @@ public class GameManager : MonoBehaviour {
         currentCharacter = teams[activeTeam].Dequeue();
         teams[activeTeam].Enqueue(currentCharacter);
         enableCurrentCharacter();
+        string previousEquation = currentCharacter.GetComponent<EquationScriptComponent>().GetString();
+        GameObject.Find("UIManager").GetComponent<UIManager>().equationInput.text = previousEquation;
         playerMode = PlayerMode.MOVING;
         currentCharacter.GetComponent<StaminaComponent>().Set(100);
         timer.Change(1000, 1000);
@@ -299,6 +301,8 @@ public class GameManager : MonoBehaviour {
         var staminaComp = character.AddComponent<Assets.StaminaComponent>();
         staminaComp.SetInit(100);
         staminaComp.Set(0);
+
+        character.AddComponent<Assets.EquationScriptComponent>();
 
         var characterRenderer = character.GetComponent<Renderer>();
         characterRenderer.material.color = teamColors[team];

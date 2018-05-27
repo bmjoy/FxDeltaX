@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public InputField equationInput;
     public Text timeLeftText;
 
+
     void Start ()
     {
     }

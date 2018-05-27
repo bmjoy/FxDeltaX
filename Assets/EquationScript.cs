@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets._2D;
 using System.Linq;
+using Assets;
 
 public class EquationScript : MonoBehaviour {
     [SerializeField]
@@ -29,6 +30,7 @@ public class EquationScript : MonoBehaviour {
     {
         if(this.equationString != newEquationString)
         {
+            GameManager.GetCurrentCharacter().GetComponent<EquationScriptComponent>().OnStringChange(newEquationString);
             try
             {
                 equation = new Text2AST.Equation(newEquationString, variables);
