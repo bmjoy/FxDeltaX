@@ -276,14 +276,7 @@ public class GameManager : MonoBehaviour {
         timer.Change(1000, 1000);
         waitForRoundTimeLeft = waitForRoundStartInitialTime;
         stopAnimationForCurrentCharacter();
-        foreach (Team t in System.Enum.GetValues(typeof(Team)))
-        {
-            if (teams[t].Count == 0)
-            {
-                EndGame();
-                return;
-            }
-        }
+
         activeTeam = activeTeam.Next();
         currentCharacter = teams[activeTeam].Dequeue();
         teams[activeTeam].Enqueue(currentCharacter);
@@ -332,6 +325,15 @@ public class GameManager : MonoBehaviour {
                 }
             }
             teams[team] = newQueue;
+        }
+
+        foreach (Team t in System.Enum.GetValues(typeof(Team)))
+        {
+            if (teams[t].Count == 0)
+            {
+                EndGame();
+                return;
+            }
         }
     }
 
