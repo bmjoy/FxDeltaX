@@ -35,7 +35,7 @@ public class ProjectileLogic : MonoBehaviour
     float isRight = 0.0f;
     public float power;
     int dontHitTTL = 5;
-    int flyTTL = 100;
+    int flyTTL = 400;
     int explosionTTL = 40;
     Vector3 savedLocation;
     public static int power2explosionTTL = 2;
