@@ -33,10 +33,11 @@ public class ProjectileLogic : MonoBehaviour
     State state = State.NotEvenAlive;
     float length = 0.3f;
     float isRight = 0.0f;
-    float power;
+    public float power;
     int dontHitTTL = 5;
     int flyTTL = 100;
     int explosionTTL = 40;
+    Vector3 savedLocation;
     public static int power2explosionTTL = 2;
     bool goDestroy = false;
     Dictionary<string, double> values = new Dictionary<string, double>() { { "x", 0f } };
@@ -105,6 +106,7 @@ public class ProjectileLogic : MonoBehaviour
                     state = State.Dying;
                     Destroy(explosion);
                 }
+                transform.position = savedLocation;
                 break;
             case State.Dying:
                 Destroy(rigid);
@@ -141,11 +143,13 @@ public class ProjectileLogic : MonoBehaviour
 
     private void Explode()
     {
+        drawer.Clear();
         TTL = explosionTTL;
         state = State.Exploding;
         alreadyHit = true;
         explosion = gameObject.AddComponent<ExplosionLogic>();
         explosion.AddData(lastLocation, power * GameManager.POWER_MULTIPLICATOR, () => { });
+        savedLocation = lastLocation;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

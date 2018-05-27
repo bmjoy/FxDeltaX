@@ -16,6 +16,12 @@ public class ProjectileDrawer : MonoBehaviour
         bullet = new Vector3[] { location - movement, location + movement };
     }
 
+    public void Clear()
+    {
+        bullet = null;
+        lineRend.positionCount = 0;
+    }
+
     // Use this for initialization
     void Start()
     {
