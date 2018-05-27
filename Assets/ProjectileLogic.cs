@@ -77,7 +77,7 @@ public class ProjectileLogic : MonoBehaviour
                 if(TTL < 0)
                 {
                     circleCol = gameObject.AddComponent<CircleCollider2D>();
-                    circleCol.radius = 0.01f;
+                    circleCol.radius = 0.1f;
                     rigid = gameObject.AddComponent<Rigidbody2D>();
                     TTL = flyTTL;
                     state = State.Flying;

@@ -11,17 +11,27 @@ public class ProjectilesManager : MonoBehaviour {
 
     public static ProjectilesManager instance;
 
-    
 
     // Use this for initialization
     void Start () {
         instance = this;	
 	}
 
+    public ProjectileLogic projectile;
+
     public static void AddProjectile(Vector3 initLocation, Text2AST.Equation equation, bool isFacingRight, float power)
     {
-        ProjectileLogic logic = instance.gameObject.AddComponent<ProjectileLogic>();
-        logic.AddData(initLocation, equation, isFacingRight, power, ()=>Destroy(logic));
+        if(instance.gameObject.GetComponent<ProjectileLogic>() == null)
+        {
+            instance.projectile = instance.gameObject.AddComponent<ProjectileLogic>();
+            instance.projectile.AddData(initLocation, equation, isFacingRight, power, ()=>instance.DestroyLogicAndDontFly());
+        }
+    }
+
+    void DestroyLogicAndDontFly()
+    {
+        Destroy(projectile);
+        projectile = null;
     }
 	
 	// Update is called once per frame

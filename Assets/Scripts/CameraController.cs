@@ -22,11 +22,18 @@ public class CameraController : MonoBehaviour
     {
         if (!enabled)
             return;
-
-        player = GameManager.instance.currentCharacter;
-        if (player == null)
-            return;
-        transform.position = player.transform.position + offset;
+        var projectile = ProjectilesManager.instance.projectile;
+        if(projectile != null)
+        {
+            transform.position = projectile.transform.position + offset;
+        }
+        else
+        {
+            player = GameManager.instance.currentCharacter;
+            if (player == null)
+                return;
+            transform.position = player.transform.position + offset;
+        }
 	}
     
 }
