@@ -237,7 +237,7 @@ public class GameManager : MonoBehaviour {
 
     private void UpdateOnWaitForRoundStart()
     {
-        if (waitForRoundTimeLeft <= 0 || currentCharacter.transform.position != startRoundPos)
+        if (waitForRoundTimeLeft <= 0 || Input.GetKeyDown(KeyCode.Space))
         {
             StateToGameplay();
         }
@@ -278,6 +278,7 @@ public class GameManager : MonoBehaviour {
     private void StateToGameplay()
     {
         state = State.GAMEPLAY;
+        enableCurrentCharacter();
         waitForRoundTimeLeft = 0;
         Camera.main.GetComponent<CameraController>().Enable(true);
         StartNewRound();
@@ -295,8 +296,9 @@ public class GameManager : MonoBehaviour {
         teams[activeTeam].Enqueue(currentCharacter);
         currentCharacter.GetComponent<StaminaComponent>().Set(100);
         startRoundPos = currentCharacter.transform.position;
-        enableCurrentCharacter();
         playerMode = PlayerMode.MOVING;
+
+        //TODO - here display text to press space
     }
 
     private void StateToShootTime()
