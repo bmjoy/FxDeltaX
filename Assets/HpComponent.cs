@@ -26,7 +26,7 @@ namespace Assets
             return GetColoredMaterial(Color.red);
         }
 
-        static readonly Vector3 offset = new Vector3(0, 2, 0);
+        static readonly Vector3 offset = new Vector3(0, 2.4f, 0);
 
         protected override Vector3 GetOffset()
         {

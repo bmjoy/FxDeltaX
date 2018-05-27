@@ -55,7 +55,7 @@ public abstract class BarComponent : MonoBehaviour {
         gameObj = new GameObject();
         renderer = gameObj.AddComponent<LineRenderer>();
         renderer.material = GetMaterial();
-        renderer.widthMultiplier = 0.3f;
+        renderer.widthMultiplier = 0.4f;
         handleTimeoutOnStamina();
 	}
 
