@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityStandardAssets._2D; 
+using UnityStandardAssets._2D;
 
 namespace Assets
 {
@@ -13,17 +13,20 @@ namespace Assets
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            PlatformerCharacter2D platformer = GetComponent<PlatformerCharacter2D>();
-            if(platformer)
+            if (GameManager.instance.GetGameState() == State.GAMEPLAY)
             {
-                Animator anim = platformer.getAnim();
-                float vSpeed = anim.GetFloat("vSpeed");
-                float speedPower = Mathf.Abs(vSpeed);
-                if(speedPower > speedPowerThreshold)
+                PlatformerCharacter2D platformer = GetComponent<PlatformerCharacter2D>();
+                if (platformer)
                 {
-                    float toHit = speedPower - speedPowerThreshold;
-                    HpComponent hpComponent = GetComponent<HpComponent>();
-                    hpComponent.Dec(toHit);
+                    Animator anim = platformer.getAnim();
+                    float vSpeed = anim.GetFloat("vSpeed");
+                    float speedPower = Mathf.Abs(vSpeed);
+                    if (speedPower > speedPowerThreshold)
+                    {
+                        float toHit = speedPower - speedPowerThreshold;
+                        HpComponent hpComponent = GetComponent<HpComponent>();
+                        hpComponent.Dec(toHit);
+                    }
                 }
             }
         }
