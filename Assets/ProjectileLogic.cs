@@ -34,7 +34,7 @@ public class ProjectileLogic : MonoBehaviour
     float length = 0.3f;
     float isRight = 0.0f;
     public float power;
-    int dontHitTTL = 5;
+    int dontHitTTL = 0;
     int flyTTL = 400;
     int explosionTTL = 40;
     Vector3 savedLocation;
@@ -154,7 +154,16 @@ public class ProjectileLogic : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (state == State.Flying)
+        GameObject gameObj = GameManager.GetCurrentCharacter();
+        bool isCollidedWithItself = false;
+        if(gameObj != null)
+        {
+            if(gameObj.Equals(collision.collider.gameObject))
+            {
+                isCollidedWithItself = true;
+            }
+        }
+        if (state == State.Flying && !isCollidedWithItself)
         {
             Debug.Log("hit sth");
             Explode();
