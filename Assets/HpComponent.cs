@@ -33,5 +33,6 @@ namespace Assets
             return offset;
         }
 
+        protected override void handleTimeoutOnStamina() { }
     }
 }

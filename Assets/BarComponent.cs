@@ -56,7 +56,10 @@ public abstract class BarComponent : MonoBehaviour {
         renderer = gameObj.AddComponent<LineRenderer>();
         renderer.material = GetMaterial();
         renderer.widthMultiplier = 0.3f;
+        handleTimeoutOnStamina();
 	}
+
+    protected abstract void handleTimeoutOnStamina();
 
 
     // Update is called once per frame
@@ -93,6 +96,7 @@ public abstract class BarComponent : MonoBehaviour {
     private LineRenderer renderer;
     private GameObject gameObj;
     private bool forceRender;
+    private int timer = 1;
 
     private void UpdateValue(float newValue)
     {

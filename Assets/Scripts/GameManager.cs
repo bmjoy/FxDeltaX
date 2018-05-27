@@ -319,8 +319,6 @@ public class GameManager : MonoBehaviour {
         if (timeLeft > 0)
         {
             --timeLeft;
-            // It cannot be done in this thread - invoke some method!
-            //currentCharacter.GetComponent<StaminaComponent>().Dec(2);
         }
     }
 }
