@@ -56,8 +56,6 @@ public class GameManager : MonoBehaviour {
     private const int waitForRoundStartInitialTime = 10;
     //private  const int startingHp = 100;
 
-    public bool endOfStamina = false;
-
 
     public static GameObject GetCurrentCharacter()
     {
@@ -203,12 +201,8 @@ public class GameManager : MonoBehaviour {
             EndGame();
         }
 
-        /*float stamina = currentCharacter.GetComponent<StaminaComponent>().value;
+        float stamina = currentCharacter.GetComponent<StaminaComponent>().value;
         if (stamina <= 0)
-        {
-            StateToShootTime();
-        }*/
-        if(endOfStamina)
         {
             StateToShootTime();
         }
@@ -288,7 +282,6 @@ public class GameManager : MonoBehaviour {
         currentCharacter = teams[activeTeam].Dequeue();
         teams[activeTeam].Enqueue(currentCharacter);
         currentCharacter.GetComponent<StaminaComponent>().Set(100);
-        endOfStamina = false;
         startRoundPos = currentCharacter.transform.position;
         enableCurrentCharacter();
         playerMode = PlayerMode.MOVING;
