@@ -129,6 +129,8 @@ public class GameManager : MonoBehaviour {
 
             createTeams(teamsQty);
             activeTeam = Team.ALPHA;
+            if (timer != null)
+                timer.Dispose();
             timer = new Timer(new TimerCallback(OnTimerTick));
             state = State.TEAM_PREPARATION;
         }
@@ -309,7 +311,8 @@ public class GameManager : MonoBehaviour {
         if (timeLeft > 0)
         {
             --timeLeft;
-            currentCharacter.GetComponent<StaminaComponent>().Dec(2);
+            // It cannot be done in this thread - invoke some method!
+            //currentCharacter.GetComponent<StaminaComponent>().Dec(2);
         }
     }
 }
