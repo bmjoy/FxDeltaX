@@ -29,7 +29,7 @@ public enum Team
 
 public class GameManager : MonoBehaviour {
 
-    public static readonly int POWER_MULTIPLICATOR = 100;
+    public static readonly int POWER_MULTIPLICATOR = 3;
 
     public static GameManager instance = null;
     public GameObject currentCharacter;
