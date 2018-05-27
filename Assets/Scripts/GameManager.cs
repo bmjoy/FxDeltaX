@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour {
 
     private Dictionary<Team, Queue<GameObject>> teams;
     private Dictionary<Team, Color> teamColors;
+    private Dictionary<Team, Color> teamColorsActive;
     private Team activeTeam;
 
     private Team winnerTeam;
@@ -145,8 +146,14 @@ public class GameManager : MonoBehaviour {
 
             teamColors = new Dictionary<Team, Color>()
             {
-                {Team.ALPHA, Color.red},
-                {Team.BRAVO, Color.blue}
+                {Team.ALPHA, new Color(1f, 0.25f, 0.25f)},
+                {Team.BRAVO, new Color(0.25f, 0.25f, 1f)}
+            };
+
+            teamColorsActive = new Dictionary<Team, Color>()
+            {
+                {Team.ALPHA, new Color(1f, 0.5f, 0.25f)},
+                {Team.BRAVO, new Color(0.25f, 0.7f, 1f)}
             };
 
             createTeams(teamsQty);
@@ -254,6 +261,7 @@ public class GameManager : MonoBehaviour {
             foreach(GameObject gameObj in teams[t])
             {
                 gameObj.GetComponent<Platformer2DUserControl>().enabled = currentCharacter.Equals(gameObj);
+                gameObj.GetComponent<Renderer>().material.color = currentCharacter.Equals(gameObj) ? teamColorsActive[t] : teamColors[t];
             }
         }
     }
