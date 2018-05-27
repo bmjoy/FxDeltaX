@@ -104,6 +104,9 @@ public class ExplosionLogic : MonoBehaviour
 
     private void OnDestroy()
     {
+        Debug.Log("Destroy");
         Destroy(drawer);
+        Destroy(circleCol.GetComponent<CircleCollider2D>());
+        Destroy(circleCol);
     }
 }
