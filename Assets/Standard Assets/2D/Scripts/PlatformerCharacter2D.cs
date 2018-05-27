@@ -19,6 +19,18 @@ namespace UnityStandardAssets._2D
         private Animator m_Anim;            // Reference to the player's animator component.
         private Rigidbody2D m_Rigidbody2D;
         public bool m_FacingRight = true;  // For determining which way the player is currently facing.
+        private System.Action m_ifMovedAction;
+        private System.Action m_ifJumpedAction;
+
+        public void IfMoved(System.Action p_action)
+        {
+            m_ifMovedAction = p_action;
+        }
+
+        public void IfJumped(System.Action p_action)
+        {
+            m_ifJumpedAction = p_action;
+        }
 
         public Animator getAnim()
         {
@@ -94,6 +106,11 @@ namespace UnityStandardAssets._2D
                     Flip();
                 }
             }
+            //Debug.Log(Mathf.Abs(move));
+            if(Mathf.Abs(move) > 0.5 && m_ifMovedAction != null)
+            {
+                m_ifMovedAction();
+            }
             // If the player should jump...
             if (m_Grounded && jump && m_Anim.GetBool("Ground"))
             {
@@ -101,6 +118,10 @@ namespace UnityStandardAssets._2D
                 m_Grounded = false;
                 m_Anim.SetBool("Ground", false);
                 m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+                if(m_ifJumpedAction != null)
+                {
+                    m_ifJumpedAction();
+                }
             }
         }
 

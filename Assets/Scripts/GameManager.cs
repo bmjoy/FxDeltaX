@@ -31,6 +31,9 @@ public class GameManager : MonoBehaviour {
 
     public static readonly int POWER_MULTIPLICATOR = 3;
 
+    public static readonly float JUMP_COST = 10;
+    public static readonly float MOVE_COST = 0.5f;
+
     public static GameManager instance = null;
     public GameObject currentCharacter;
 
@@ -359,6 +362,9 @@ public class GameManager : MonoBehaviour {
 
         character.AddComponent<Assets.EquationScriptComponent>();
         character.AddComponent<Assets.FallingHitter>();
+
+        character.GetComponent<PlatformerCharacter2D>().IfJumped(() => character.GetComponent<StaminaComponent>().Dec(JUMP_COST));
+        character.GetComponent<PlatformerCharacter2D>().IfMoved(() => character.GetComponent<StaminaComponent>().Dec(MOVE_COST)); 
 
         var characterRenderer = character.GetComponent<Renderer>();
         characterRenderer.material.color = teamColors[team];
