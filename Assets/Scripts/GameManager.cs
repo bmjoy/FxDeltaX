@@ -165,7 +165,7 @@ public class GameManager : MonoBehaviour {
             activeTeam = activeTeam.Next();
             if (areAllTeamsFullyCreated())
             {
-                StateToGameplay();
+                StateToWaitForRoundStart();
                 return;
             }
 
@@ -199,6 +199,12 @@ public class GameManager : MonoBehaviour {
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
             EndGame();
+        }
+
+        if (currentCharacter == null)
+        {
+            StateToWaitForRoundStart();
+            return;
         }
 
         float stamina = currentCharacter.GetComponent<StaminaComponent>().value;
