@@ -5,8 +5,8 @@ using UnityEngine;
 public class GameSettings : MonoBehaviour {
 
     public static GameSettings instance;
-    private int roundTime = 3;
-    private int charactersQty = 2;
+    static private int roundTime = 30;
+    static private int charactersQty = 4;
 
     public GameSettings()
     {
