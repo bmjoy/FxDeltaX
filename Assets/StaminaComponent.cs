@@ -27,12 +27,18 @@ namespace Assets
 
         protected override void handleTimeoutOnStamina()
         {
-            InvokeRepeating("decreaseStamina", 0.0f, 1f);
+            InvokeRepeating("decreaseStaminaInTime", 0.0f, 1f);
         }
 
         private void decreaseStamina()
         {
             Dec(2.0f);
+        }
+
+        private void decreaseStaminaInTime()
+        {
+            if (GameManager.GetGameState() == State.GAMEPLAY)
+                decreaseStamina();
         }
     }
 }

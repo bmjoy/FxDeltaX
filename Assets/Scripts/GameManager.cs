@@ -40,7 +40,8 @@ public class GameManager : MonoBehaviour {
 
     private Timer timer;
     private int waitForRoundTimeLeft;
-    //private int timeLeft;
+
+    private Vector3 startRoundPos;
 
     private State state = State.GAME_NOT_STARTED;
     private PlayerMode playerMode = PlayerMode.MOVING;
@@ -150,7 +151,7 @@ public class GameManager : MonoBehaviour {
         {
             if (areAllTeamsFullyCreated())
             {
-                prepareToGameplay();
+                StateToGameplay();
                 return;
             }
             else if(isCurrentTeamFullyCreated())
@@ -193,13 +194,8 @@ public class GameManager : MonoBehaviour {
         float stamina = currentCharacter.GetComponent<StaminaComponent>().value;
         if (stamina <= 0)
         {
-            WaitForShootingFinish();
+            StateToShootTime();
         }
-    }
-
-    private void WaitForShootingFinish()
-    {
-        state = State.SHOOT_TIME;
     }
 
     private void UpdateOnShootTime()
@@ -207,35 +203,16 @@ public class GameManager : MonoBehaviour {
         var projectile = ProjectilesManager.instance.projectile;
         if (projectile == null)
         {
-            state = State.WAIT_FOR_ROUND_START;
-            timer.Change(1000, 1000);
-            waitForRoundTimeLeft = waitForRoundStartInitialTime;
-            stopAnimationForCurrentCharacter();
-            if (teams[activeTeam].Count == 0)
-            {
-                EndGame();
-                return;
-            }
-            currentCharacter = teams[activeTeam].Dequeue();
-            teams[activeTeam].Enqueue(currentCharacter);
-            currentCharacter.GetComponent<StaminaComponent>().Set(100);
+            StateToWaitForRoundStart();
         }
     }
 
     private void UpdateOnWaitForRoundStart()
     {
-        if (waitForRoundTimeLeft <= 0 || Input.GetKeyDown(KeyCode.Space))
+        if (waitForRoundTimeLeft <= 0 || currentCharacter.transform.position != startRoundPos)
         {
-            state = State.GAMEPLAY;
-            waitForRoundTimeLeft = 0;
-            StartNewRound();
+            StateToGameplay();
         }
-    }
-
-    private void prepareToGameplay()
-    {
-        state = State.GAMEPLAY;
-        Camera.main.GetComponent<CameraController>().Enable(true);
     }
 
     private bool isCurrentTeamFullyCreated()
@@ -269,6 +246,42 @@ public class GameManager : MonoBehaviour {
         stopAnimationForCurrentCharacter();
     }
 
+    private void StateToGameplay()
+    {
+        state = State.GAMEPLAY;
+        waitForRoundTimeLeft = 0;
+        Camera.main.GetComponent<CameraController>().Enable(true);
+        StartNewRound();
+    }
+
+    private void StateToWaitForRoundStart()
+    {
+        state = State.WAIT_FOR_ROUND_START;
+        timer.Change(1000, 1000);
+        waitForRoundTimeLeft = waitForRoundStartInitialTime;
+        stopAnimationForCurrentCharacter();
+        foreach (Team t in System.Enum.GetValues(typeof(Team)))
+        {
+            if (teams[t].Count == 0)
+            {
+                EndGame();
+                return;
+            }
+        }
+        activeTeam = activeTeam.Next();
+        currentCharacter = teams[activeTeam].Dequeue();
+        teams[activeTeam].Enqueue(currentCharacter);
+        currentCharacter.GetComponent<StaminaComponent>().Set(100);
+        startRoundPos = currentCharacter.transform.position;
+        enableCurrentCharacter();
+        playerMode = PlayerMode.MOVING;
+    }
+
+    private void StateToShootTime()
+    {
+        state = State.SHOOT_TIME;
+    }
+
     private void stopAnimationForCurrentCharacter()
     {
         if(currentCharacter != null)
@@ -279,17 +292,8 @@ public class GameManager : MonoBehaviour {
 
     private void StartNewRound()
     {
-        activeTeam = activeTeam.Next();
-        if(!teams[activeTeam].Any())
-        {
-            EndGame();
-            return;
-        }
-
-        enableCurrentCharacter();
         string previousEquation = currentCharacter.GetComponent<EquationScriptComponent>().GetString();
         GameObject.Find("UIManager").GetComponent<UIManager>().equationInput.text = previousEquation;
-        playerMode = PlayerMode.MOVING;
         timer.Change(1000, 1000);
     }
 
