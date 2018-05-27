@@ -198,6 +198,8 @@ public class GameManager : MonoBehaviour {
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
+            Debug.Log("Sudoku");
+            teams[activeTeam].Clear();
             EndGame();
         }
 
