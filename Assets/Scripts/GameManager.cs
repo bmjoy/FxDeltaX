@@ -16,7 +16,9 @@ public enum State
 {
     GAME_NOT_STARTED,
     TEAM_PREPARATION,
-    GAMEPLAY
+    GAMEPLAY,
+    SHOOT_TIME,
+    WAIT_FOR_ROUND_START
 };
 
 public class GameManager : MonoBehaviour {
@@ -37,7 +39,8 @@ public class GameManager : MonoBehaviour {
     private Team activeTeam;
 
     private Timer timer;
-    private int timeLeft;
+    private int waitForRoundTimeLeft;
+    //private int timeLeft;
 
     private State state = State.GAME_NOT_STARTED;
     private PlayerMode playerMode = PlayerMode.MOVING;
@@ -47,6 +50,7 @@ public class GameManager : MonoBehaviour {
     private static int playersQty = 4;
     private static int serieTime = 3;
     private const int teamsQty = 2;
+    private const int waitForRoundStartInitialTime = 10;
     //private  const int startingHp = 100;
 
 
@@ -60,12 +64,12 @@ public class GameManager : MonoBehaviour {
         return instance.playerMode;
     }
 
-    public static int GetRoundLeftTime()
+    public static int GetIdleLeftTime()
     {
-        return instance.timeLeft;
+        return instance.waitForRoundTimeLeft;
     }
 
-    public State GetGameState()
+    public static State GetGameState()
     {
         return instance.state;
     }
@@ -112,6 +116,10 @@ public class GameManager : MonoBehaviour {
             UpdateOnTeamPreparation();
         else if (state == State.GAMEPLAY)
             UpdateOnGameplay();
+        else if (state == State.SHOOT_TIME)
+            UpdateOnShootTime();
+        else if (state == State.WAIT_FOR_ROUND_START)
+            UpdateOnWaitForRoundStart();
     }
 
     private void UpdateOnGameNotStarted()
@@ -181,9 +189,45 @@ public class GameManager : MonoBehaviour {
         {
             EndGame();
         }
-        if (timeLeft == 0)
+
+        float stamina = currentCharacter.GetComponent<StaminaComponent>().value;
+        if (stamina <= 0)
         {
+            WaitForShootingFinish();
+        }
+    }
+
+    private void WaitForShootingFinish()
+    {
+        state = State.SHOOT_TIME;
+    }
+
+    private void UpdateOnShootTime()
+    {
+        var projectile = ProjectilesManager.instance.projectile;
+        if (projectile == null)
+        {
+            state = State.WAIT_FOR_ROUND_START;
+            timer.Change(1000, 1000);
+            waitForRoundTimeLeft = waitForRoundStartInitialTime;
             stopAnimationForCurrentCharacter();
+            if (teams[activeTeam].Count == 0)
+            {
+                EndGame();
+                return;
+            }
+            currentCharacter = teams[activeTeam].Dequeue();
+            teams[activeTeam].Enqueue(currentCharacter);
+            currentCharacter.GetComponent<StaminaComponent>().Set(100);
+        }
+    }
+
+    private void UpdateOnWaitForRoundStart()
+    {
+        if (waitForRoundTimeLeft <= 0 || Input.GetKeyDown(KeyCode.Space))
+        {
+            state = State.GAMEPLAY;
+            waitForRoundTimeLeft = 0;
             StartNewRound();
         }
     }
@@ -241,15 +285,12 @@ public class GameManager : MonoBehaviour {
             EndGame();
             return;
         }
-        currentCharacter = teams[activeTeam].Dequeue();
-        teams[activeTeam].Enqueue(currentCharacter);
+
         enableCurrentCharacter();
         string previousEquation = currentCharacter.GetComponent<EquationScriptComponent>().GetString();
         GameObject.Find("UIManager").GetComponent<UIManager>().equationInput.text = previousEquation;
         playerMode = PlayerMode.MOVING;
-        currentCharacter.GetComponent<StaminaComponent>().Set(100);
         timer.Change(1000, 1000);
-        timeLeft = serieTime;
     }
 
 
@@ -316,11 +357,10 @@ public class GameManager : MonoBehaviour {
 
     private void OnTimerTick(System.Object stateInfo)
     {
-        if (timeLeft > 0)
+        if (waitForRoundTimeLeft > 0)
         {
             --timeLeft;
-            // It cannot be done in this thread - invoke some method!
-            //currentCharacter.GetComponent<StaminaComponent>().Dec(2);
+            --waitForRoundTimeLeft;
         }
     }
 }

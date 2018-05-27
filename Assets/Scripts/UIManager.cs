@@ -19,12 +19,17 @@ public class UIManager : MonoBehaviour
     void FixedUpdate ()
     {
         var playerMode = GameManager.GetPlayerMode();
-        bool showCanvas = (playerMode == PlayerMode.SHOOTING);
+        var gameState = GameManager.GetGameState();
+        bool showCanvas = (playerMode == PlayerMode.SHOOTING && gameState == State.GAMEPLAY);
 
         equationInput.gameObject.SetActive(showCanvas);
         equationInput.Select();
         equationInput.ActivateInputField();
 
-        timeLeftText.text = GameManager.GetRoundLeftTime().ToString();
+        int time = GameManager.GetIdleLeftTime();
+        bool visible = time > 0;
+
+        timeLeftText.enabled = visible;
+        timeLeftText.text = time.ToString();
     }
 }

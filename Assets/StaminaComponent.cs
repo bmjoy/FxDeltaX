@@ -24,5 +24,15 @@ namespace Assets
         {
             return offset;
         }
+
+        protected override void handleTimeoutOnStamina()
+        {
+            InvokeRepeating("decreaseStamina", 0.0f, 1f);
+        }
+
+        private void decreaseStamina()
+        {
+            Dec(2.0f);
+        }
     }
 }
