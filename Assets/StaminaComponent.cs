@@ -8,6 +8,13 @@ namespace Assets
 {
     public class StaminaComponent : BarComponent
     {
+        protected float staminaDecreaseStep;
+
+        StaminaComponent()
+        {
+            staminaDecreaseStep = 100.0f / GameSettings.instance.GetRoundTime();
+        }
+
         protected override void WhenBelowOrEqualZero()
         {
             //throw new NotImplementedException();
@@ -32,7 +39,7 @@ namespace Assets
 
         private void decreaseStamina()
         {
-            Dec(2.0f);
+            Dec(staminaDecreaseStep);
         }
 
         private void decreaseStaminaInTime()
