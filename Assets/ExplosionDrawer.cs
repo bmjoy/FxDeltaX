@@ -31,7 +31,7 @@ public class ExplosionDrawer : MonoBehaviour
         explosionPrefab = (GameObject)Instantiate(Resources.Load("Fx Explosion Pack/Prefebs/Exploson1"));
         explosionPrefab.transform.position = ProjectilesManager.instance.projectile.transform.position;
         ParticleSystem part = explosionPrefab.GetComponentInChildren<ParticleSystem>();
-        part.startSize = ProjectilesManager.instance.projectile.power / 5;
+        part.startSize = ProjectilesManager.instance.projectile.power / 4;
     }
 
 
