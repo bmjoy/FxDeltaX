@@ -18,6 +18,10 @@ namespace Assets
         protected override void WhenBelowOrEqualZero()
         {
             //throw new NotImplementedException();
+            if(GameManager.GetGameState() == State.GAMEPLAY)
+            {
+                GameManager.instance.endOfStamina = true;
+            }
         }
 
         protected override Material GetMaterial()
