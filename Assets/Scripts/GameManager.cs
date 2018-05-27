@@ -31,8 +31,8 @@ public class GameManager : MonoBehaviour {
 
     public static readonly int POWER_MULTIPLICATOR = 3;
 
-    public static readonly float JUMP_COST = 10;
-    public static readonly float MOVE_COST = 0.5f;
+    public static readonly float JUMP_COST = 12;
+    public static readonly float MOVE_COST = 0.6f;
 
     public static GameManager instance = null;
     public GameObject currentCharacter;
