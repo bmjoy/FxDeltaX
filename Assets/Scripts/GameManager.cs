@@ -162,14 +162,11 @@ public class GameManager : MonoBehaviour {
     {
         if (!characterPlacing)
         {
+            activeTeam = activeTeam.Next();
             if (areAllTeamsFullyCreated())
             {
                 StateToGameplay();
                 return;
-            }
-            else if(isCurrentTeamFullyCreated())
-            {
-                activeTeam = activeTeam.Next();
             }
 
             var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -313,27 +310,6 @@ public class GameManager : MonoBehaviour {
 
     public void KillCharacter(GameObject characterToKill)
     {
-        if(currentCharacter.Equals(characterToKill))
-        {
-          //  throw new System.Exception("kiled yourself, need to handle that");
-        }
-        /*foreach(var teamQueuePair in teams)
-        {
-            var queue = teamQueuePair.Value;
-            if(queue.Contains(characterToKill))
-            {
-                var newQueue = new Queue<GameObject>();
-                foreach(var character in queue)
-                {
-                    if(!character.Equals(characterToKill))
-                    {
-                        newQueue.Enqueue(character);
-                    }
-                }
-                
-                teams[teamQueuePair.Key] = newQueue;
-            }
-        }*/
         foreach (Team team in System.Enum.GetValues(typeof(Team)))
         {
             var newQueue = new Queue<GameObject>();
