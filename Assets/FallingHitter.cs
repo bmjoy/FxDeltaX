@@ -13,7 +13,7 @@ namespace Assets
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (GameManager.instance.GetGameState() == State.GAMEPLAY)
+            if (GameManager.GetGameState() == State.GAMEPLAY)
             {
                 PlatformerCharacter2D platformer = GetComponent<PlatformerCharacter2D>();
                 if (platformer)

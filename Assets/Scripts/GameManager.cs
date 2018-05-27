@@ -359,7 +359,6 @@ public class GameManager : MonoBehaviour {
     {
         if (waitForRoundTimeLeft > 0)
         {
-            --timeLeft;
             --waitForRoundTimeLeft;
         }
     }
