@@ -10,7 +10,7 @@ public class UIManager : MonoBehaviour
 
     public InputField equationInput;
     public Text timeLeftText;
-
+    public Text pressSpaceText;
 
     void Start ()
     {
@@ -31,5 +31,10 @@ public class UIManager : MonoBehaviour
 
         timeLeftText.enabled = visible;
         timeLeftText.text = time.ToString();
+
+        bool showPressSpace = (gameState == State.WAIT_FOR_ROUND_START);
+        pressSpaceText.transform.position = equationInput.transform.position;
+        pressSpaceText.enabled = showPressSpace;
+        
     }
 }
