@@ -5,5 +5,6 @@ TGK project
 Feature list:
 
 Gameplay:
-![gif1](gif/1.gif)
-![gif2](gif/2.gif)
+
+![gif2](gif/optimized-2.gif)
+![gif1](gif/optimized-1.gif)
