@@ -65,6 +65,12 @@ namespace UnityStandardAssets._2D
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
         }
 
+        public void ResetYSpeed()
+        {
+            m_Anim.SetFloat("Speed", 0);
+            m_Rigidbody2D.velocity = Vector2.zero;
+        }
+
 
         public void Move(float move, bool crouch, bool jump)
         {

@@ -27,6 +27,46 @@ public enum Team
     BRAVO
 };
 
+public class TimerPolyfill : System.IDisposable
+{
+    public TimerPolyfill(TimerCallback kolbek)
+    {
+        this.kolbek = kolbek;
+    }
+    public void SetTime(float time)
+    {
+        this.time = time;
+        this.setTime = time;
+    }
+    public void TickUpdate(float dt)
+    {
+        Tick(dt * 1000.0f);
+    }
+    public void Tick(float dt)
+    {
+        time -= dt;
+        if(time <= 0.0f)
+        {
+            if(!isDisposed)
+            {
+                kolbek(null);
+                time = setTime;
+            }
+        }
+    }
+    public void Dispose()
+    {
+        if(!isDisposed)
+        {
+            isDisposed = true;
+        }
+    }
+    bool isDisposed = false;
+    float time = 0.0f;
+    float setTime = 0.0f;
+    TimerCallback kolbek;
+}
+
 public class GameManager : MonoBehaviour {
 
     public static readonly int POWER_MULTIPLICATOR = 3;
@@ -44,7 +84,7 @@ public class GameManager : MonoBehaviour {
 
     private Team winnerTeam;
 
-    private Timer timer;
+    private TimerPolyfill timer;
     private int waitForRoundTimeLeft;
 
     private Vector3 startRoundPos;
@@ -138,6 +178,9 @@ public class GameManager : MonoBehaviour {
             UpdateOnShootTime();
         else if (state == State.WAIT_FOR_ROUND_START)
             UpdateOnWaitForRoundStart();
+
+        timer.TickUpdate(Time.deltaTime);
+
     }
 
     private void UpdateOnGameNotStarted()
@@ -163,7 +206,8 @@ public class GameManager : MonoBehaviour {
             activeTeam = Team.ALPHA;
             if (timer != null)
                 timer.Dispose();
-            timer = new Timer(new TimerCallback(OnTimerTick));
+            timer = new TimerPolyfill(new TimerCallback(OnTimerTick));
+            timer.SetTime(1000);
             state = State.TEAM_PREPARATION;
         }
     }
@@ -194,7 +238,10 @@ public class GameManager : MonoBehaviour {
             mousePos.z = 0;
             currentCharacter.transform.position = mousePos;
             if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
                 characterPlacing = false;
+                currentCharacter.GetComponent<PlatformerCharacter2D>().ResetYSpeed();
+            }
         }
     }
 
@@ -287,7 +334,8 @@ public class GameManager : MonoBehaviour {
     private void StateToWaitForRoundStart()
     {
         state = State.WAIT_FOR_ROUND_START;
-        timer.Change(1000, 1000);
+        //timer.Change(1000, 1000);
+        timer.SetTime(1000);
         waitForRoundTimeLeft = waitForRoundStartInitialTime;
         stopAnimationForCurrentCharacter();
 
@@ -318,7 +366,8 @@ public class GameManager : MonoBehaviour {
     {
         string previousEquation = currentCharacter.GetComponent<EquationScriptComponent>().GetString();
         GameObject.Find("UIManager").GetComponent<UIManager>().equationInput.text = previousEquation;
-        timer.Change(1000, 1000);
+        timer.SetTime(1000);
+        //timer.Change(1000, 1000);
     }
 
 
