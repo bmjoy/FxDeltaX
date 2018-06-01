@@ -2,6 +2,8 @@
 
 TGK project
 
+[Playable web demo](https://m-karcz.github.io/fxdeltax/index.html)
+
 Feature list:
 
 Gameplay:
